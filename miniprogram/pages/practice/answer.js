@@ -1,5 +1,7 @@
 const app = getApp();
 
+let _timerId = null;
+
 Page({
   data: {
     questions: [],
@@ -11,12 +13,20 @@ Page({
     isCorrect: false,
     earnedPoints: 0,
     usedTime: 0,
-    timer: null,
+    isTimerRunning: false,
     showPointsAnimation: false,
     pointsAnimation: null,
     showCoinAnimation: false,
     coinCount: 5,
     typeText: ''
+  },
+
+  _clearTimer: function() {
+    if (_timerId) {
+      clearInterval(_timerId);
+      _timerId = null;
+    }
+    this.setData({ isTimerRunning: false });
   },
 
   onLoad: function(options) {
@@ -38,10 +48,18 @@ Page({
     }
   },
 
-  onUnload: function() {
-    if (this.data.timer) {
-      clearInterval(this.data.timer);
+  onShow: function() {
+    if (this.data.questions && this.data.questions.length > 0 && !this.data.isTimerRunning) {
+      this.startTimer();
     }
+  },
+
+  onHide: function() {
+    this._clearTimer();
+  },
+
+  onUnload: function() {
+    this._clearTimer();
   },
 
   loadQuestionsForWrong: function(wrongQuestionId) {
@@ -107,14 +125,18 @@ Page({
   },
 
   startTimer: function() {
+    this._clearTimer();
+    
     const that = this;
-    this.setData({
+    _timerId = setInterval(() => {
+      that.setData({
+        usedTime: that.data.usedTime + 1
+      });
+    }, 1000);
+    
+    this.setData({ 
       usedTime: 0,
-      timer: setInterval(() => {
-        that.setData({
-          usedTime: that.data.usedTime + 1
-        });
-      }, 1000)
+      isTimerRunning: true
     });
   },
 
