@@ -2,7 +2,7 @@
   <view class="header-section">
     <view class="user-info">
       <image class="avatar" src="{{userInfo.avatar || '/assets/default-avatar.png'}}" mode="aspectFill" wx:if="{{userInfo}}"></image>
-      <view class="avatar-placeholder" wx:else>{{userInfo.nickname ? userInfo.nickname.charAt(0) : '用'}}</view>
+      <view class="avatar-placeholder" wx:else>{{userInfo._nicknameFirstChar || '用'}}</view>
       <view class="user-text">
         <view class="nickname">{{userInfo.nickname || '用户'}}</view>
         <view class="grade">{{userInfo.grade_name || ''}}</view>

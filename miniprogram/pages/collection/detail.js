@@ -180,6 +180,17 @@ Page({
     this.setData({ showAddPopup: false });
   },
 
+  updateSelectedState: function() {
+    const { availableQuestions, selectedIds } = this.data;
+    const updatedQuestions = availableQuestions.map(item => {
+      return {
+        ...item,
+        _selected: selectedIds.indexOf(item.id) > -1
+      };
+    });
+    this.setData({ availableQuestions: updatedQuestions });
+  },
+
   loadAvailableQuestions: function() {
     const that = this;
     const { collectionId } = this.data;
@@ -194,6 +205,7 @@ Page({
       success: function(res) {
         if (res.code === 200) {
           that.setData({ availableQuestions: res.data.list || [] });
+          that.updateSelectedState();
         }
       }
     });
@@ -215,6 +227,7 @@ Page({
     }
     
     this.setData({ selectedIds: [...selectedIds] });
+    this.updateSelectedState();
   },
 
   submitAdd: function() {

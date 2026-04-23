@@ -48,12 +48,19 @@ Page({
     this.loadStatistics();
   },
 
+  formatUserInfo: function(userInfo) {
+    if (!userInfo) return userInfo;
+    const formatted = Object.assign({}, userInfo);
+    formatted._nicknameFirstChar = formatted.nickname ? formatted.nickname.charAt(0) : '用';
+    return formatted;
+  },
+
   loadUserInfo: function() {
     const that = this;
     const userInfo = wx.getStorageSync('userInfo');
     
     if (userInfo) {
-      that.setData({ userInfo: userInfo });
+      that.setData({ userInfo: that.formatUserInfo(userInfo) });
     }
     
     app.request({
@@ -61,7 +68,8 @@ Page({
       method: 'GET',
       success: function(res) {
         if (res.code === 200) {
-          that.setData({ userInfo: res.data });
+          const formattedUser = that.formatUserInfo(res.data);
+          that.setData({ userInfo: formattedUser });
           app.globalData.userInfo = res.data;
           wx.setStorageSync('userInfo', res.data);
         }
