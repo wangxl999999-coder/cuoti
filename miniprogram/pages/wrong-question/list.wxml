@@ -1,0 +1,64 @@
+<view class="list-container">
+  <view class="filter-section">
+    <view class="filter-row">
+      <view class="filter-item {{currentSubject === 0 ? 'active' : ''}}" bindtap="selectSubject" data-id="0">
+        全部
+      </view>
+      <view class="filter-item {{currentSubject === item.id ? 'active' : ''}}" wx:for="{{subjects}}" wx:key="id" bindtap="selectSubject" data-id="{{item.id}}">
+        {{item.name}}
+      </view>
+    </view>
+    <view class="status-tabs">
+      <view class="tab-item {{currentStatus === -1 ? 'active' : ''}}" bindtap="selectStatus" data-status="-1">
+        全部
+      </view>
+      <view class="tab-item {{currentStatus === 0 ? 'active' : ''}}" bindtap="selectStatus" data-status="0">
+        待掌握
+      </view>
+      <view class="tab-item {{currentStatus === 1 ? 'active' : ''}}" bindtap="selectStatus" data-status="1">
+        已掌握
+      </view>
+    </view>
+  </view>
+
+  <view class="question-list">
+    <view class="question-item" wx:for="{{questionList}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
+      <view class="question-header">
+        <view class="question-tag">
+          <text class="tag tag-primary">{{item.subject_name}}</text>
+          <text class="tag tag-info" wx:if="{{item.is_mastered}}">已掌握</text>
+          <text class="tag tag-warning" wx:else>待掌握</text>
+        </view>
+        <view class="question-time">{{item.create_time}}</view>
+      </view>
+      <view class="question-content">
+        <image class="question-image" src="{{item.image_url}}" mode="aspectFill" wx:if="{{item.image_url}}"></image>
+        <view class="question-text" wx:else>{{item.question_text}}</view>
+      </view>
+      <view class="question-footer">
+        <view class="error-count">做错 {{item.error_count}} 次</view>
+        <view class="difficulty">
+          <text wx:for="{{3}}" wx:key="index" class="star {{index < item.difficulty ? 'active' : ''}}">★</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:if="{{questionList.length === 0 && !loading}}">
+    <view class="empty-icon">📖</view>
+    <view class="empty-text">暂无错题记录</view>
+    <view class="empty-tip">点击下方按钮，开始记录你的第一道错题</view>
+  </view>
+
+  <view class="add-fab" bindtap="goToAdd">
+    <text class="fab-icon">+</text>
+  </view>
+
+  <view class="loading-more" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <view class="no-more" wx:if="{{noMore && questionList.length > 0}}">
+    <text>没有更多了</text>
+  </view>
+</view>

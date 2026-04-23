@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>用户详情 - 错题本管理系统</title>
+  <link rel="stylesheet" href="/static/layui/css/layui.css">
+  <style>
+    .page-container {
+      padding: 20px;
+    }
+    .user-card {
+      background: linear-gradient(135deg, #4CAF50, #8BC34A);
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+    }
+    .user-avatar-large {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+    }
+    .avatar-large-placeholder {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 40px;
+      font-weight: bold;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+    }
+    .user-info-main {
+      margin-left: 30px;
+      color: #fff;
+    }
+    .user-name {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .user-meta {
+      display: flex;
+      gap: 20px;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    .info-section {
+      background: #fff;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .info-item {
+      display: flex;
+      flex-direction: column;
+    }
+    .info-item label {
+      font-size: 13px;
+      color: #999;
+      margin-bottom: 5px;
+    }
+    .info-item value {
+      font-size: 15px;
+      color: #333;
+      font-weight: 500;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    .stat-card {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+    }
+    .stat-card .stat-value {
+      font-size: 28px;
+      font-weight: bold;
+      color: #4CAF50;
+      margin-bottom: 5px;
+    }
+    .stat-card .stat-label {
+      font-size: 13px;
+      color: #999;
+    }
+    @media (max-width: 992px) {
+      .info-grid { grid-template-columns: repeat(2, 1fr); }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <div class="user-card">
+      {if $user.avatar}
+        <img src="{$user.avatar}" class="user-avatar-large" alt="头像">
+      {else /}
+        <div class="avatar-large-placeholder">{$user.nickname ? mb_substr($user.nickname, 0, 1) : '用'}</div>
+      {/if}
+      <div class="user-info-main">
+        <div class="user-name">{$user.nickname ? $user.nickname : '未设置昵称'}</div>
+        <div class="user-meta">
+          <span>📱 {$user.phone}</span>
+          <span>🏫 {$gradeName}</span>
+          <span>⭐ {$user.points} 积分</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-section">
+      <div class="section-title">基本信息</div>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>用户ID</label>
+          <value>{$user.id}</value>
+        </div>
+        <div class="info-item">
+          <label>昵称</label>
+          <value>{$user.nickname ? $user.nickname : '未设置'}</value>
+        </div>
+        <div class="info-item">
+          <label>手机号</label>
+          <value>{$user.phone ? $user.phone : '未绑定'}</value>
+        </div>
+        <div class="info-item">
+          <label>年级</label>
+          <value>{$gradeName}</value>
+        </div>
+        <div class="info-item">
+          <label>当前积分</label>
+          <value><span style="color: #4CAF50; font-weight: bold;">{$user.points}</span></value>
+        </div>
+        <div class="info-item">
+          <label>累计积分</label>
+          <value><span style="color: #4CAF50; font-weight: bold;">{$user.total_points}</span></value>
+        </div>
+        <div class="info-item">
+          <label>状态</label>
+          <value>
+            {if $user.status == 1}
+              <span style="color: #4CAF50;">正常</span>
+            {else /}
+              <span style="color: #f56c6c;">禁用</span>
+            {/if}
+          </value>
+        </div>
+        <div class="info-item">
+          <label>注册时间</label>
+          <value>{$user.create_time}</value>
+        </div>
+        <div class="info-item">
+          <label>最后登录</label>
+          <value>{$user.last_login_time ? $user.last_login_time : '未登录过'}</value>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-section">
+      <div class="section-title">积分明细（最近10条）</div>
+      <table class="layui-table">
+        <thead>
+          <tr>
+            <th width="80">类型</th>
+            <th width="100">积分变动</th>
+            <th width="300">描述</th>
+            <th width="180">时间</th>
+          </tr>
+        </thead>
+        <tbody>
+          {volist name="pointsLogs" id="vo"}
+          <tr>
+            <td>
+              {if $vo.type == 1}答题奖励
+              {elseif $vo.type == 2}连续答题
+              {elseif $vo.type == 3}签到奖励
+              {elseif $vo.type == 4}连续签到
+              {elseif $vo.type == 5}掌握奖励
+              {elseif $vo.type == 6}新用户奖励
+              {else}其他{/if}
+            </td>
+            <td style="color: {$vo.points > 0 ? '#4CAF50' : '#f56c6c'}; font-weight: bold;">
+              {$vo.points > 0 ? '+' : ''}{$vo.points}
+            </td>
+            <td>{$vo.description}</td>
+            <td>{$vo.create_time}</td>
+          </tr>
+          {empty name="pointsLogs"}
+          <tr>
+            <td colspan="4" style="text-align: center; color: #999;">暂无积分记录</td>
+          </tr>
+          {/empty}
+          {/volist}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

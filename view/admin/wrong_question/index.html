@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>错题管理 - 错题本管理系统</title>
+  <link rel="stylesheet" href="/static/layui/css/layui.css">
+  <style>
+    .page-container {
+      padding: 20px;
+    }
+    .search-form {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .question-image {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 4px;
+      background: #f0f0f0;
+      cursor: pointer;
+    }
+    .difficulty-star {
+      color: #FFD700;
+    }
+    .difficulty-empty {
+      color: #ddd;
+    }
+    .status-mastered {
+      color: #4CAF50;
+      background: #e8f5e9;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .status-not-mastered {
+      color: #e6a23c;
+      background: #fff3e0;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .image-preview {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .image-preview img {
+      max-width: 80%;
+      max-height: 80%;
+      border-radius: 8px;
+    }
+    .image-preview .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      color: #fff;
+      font-size: 30px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <form class="layui-form search-form" id="searchForm">
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label">关键词</label>
+          <div class="layui-input-inline">
+            <input type="text" name="keyword" placeholder="题目内容" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">科目</label>
+          <div class="layui-input-inline">
+            <select name="subject_id">
+              <option value="">全部科目</option>
+              {volist name="subjects" id="vo"}
+              <option value="{$vo.id}">{$vo.name}</option>
+              {/volist}
+            </select>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">年级</label>
+          <div class="layui-input-inline">
+            <select name="grade_id">
+              <option value="">全部年级</option>
+              {volist name="grades" id="vo"}
+              <option value="{$vo.id}">{$vo.name}</option>
+              {/volist}
+            </select>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">掌握状态</label>
+          <div class="layui-input-inline">
+            <select name="is_mastered">
+              <option value="-1">全部</option>
+              <option value="1">已掌握</option>
+              <option value="0">待掌握</option>
+            </select>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <button class="layui-btn layui-btn-normal" lay-submit lay-filter="search">
+            <i class="layui-icon layui-icon-search"></i> 搜索
+          </button>
+          <button type="reset" class="layui-btn layui-btn-primary">
+            <i class="layui-icon layui-icon-refresh"></i> 重置
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <table class="layui-hide" id="questionTable" lay-filter="questionTable"></table>
+
+    <script type="text/html" id="toolbarDemo">
+      <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="batchDelete">
+          <i class="layui-icon layui-icon-delete"></i> 批量删除
+        </button>
+        <button class="layui-btn layui-btn-sm" lay-event="refresh">
+          <i class="layui-icon layui-icon-refresh"></i> 刷新
+        </button>
+      </div>
+    </script>
+
+    <script type="text/html" id="imageTpl">
+      {{# if(d.image_url){ }}
+        <img src="{{d.image_url}}" class="question-image" onclick="previewImage('{{d.image_url}}')">
+      {{# } else { }}
+        <span style="color: #999; font-size: 12px;">无图片</span>
+      {{# } }}
+    </script>
+
+    <script type="text/html" id="questionTpl">
+      <div style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{d.question_text}}">
+        {{d.question_text || '暂无内容'}}
+      </div>
+    </script>
+
+    <script type="text/html" id="difficultyTpl">
+      {{# for(var i=0; i<d.difficulty; i++){ }}
+        <span class="difficulty-star">★</span>
+      {{# } }}
+      {{# for(var i=d.difficulty; i<3; i++){ }}
+        <span class="difficulty-empty">★</span>
+      {{# } }}
+    </script>
+
+    <script type="text/html" id="masteredTpl">
+      {{# if(d.is_mastered){ }}
+        <span class="status-mastered">已掌握</span>
+      {{# } else { }}
+        <span class="status-not-mastered">待掌握</span>
+      {{# } }}
+    </script>
+
+    <script type="text/html" id="barDemo">
+      <a class="layui-btn layui-btn-xs" lay-event="detail">查看</a>
+      <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>
+    </script>
+  </div>
+
+  <script src="/static/layui/layui.js"></script>
+  <script>
+    layui.use(['table', 'form', 'layer'], function(){
+      var table = layui.table;
+      var form = layui.form;
+      var layer = layui.layer;
+
+      var questionTable = table.render({
+        elem: '#questionTable',
+        url: '/admin/wrong-question/list',
+        toolbar: '#toolbarDemo',
+        defaultToolbar: ['filter', 'print', 'exports'],
+        cols: [[
+          {type: 'checkbox', fixed: 'left'},
+          {field: 'id', title: 'ID', width: 80, sort: true},
+          {field: 'image_url', title: '图片', width: 80, templet: '#imageTpl'},
+          {field: 'question_text', title: '题目', width: 300, templet: '#questionTpl'},
+          {field: 'user_name', title: '用户', width: 100},
+          {field: 'subject_name', title: '科目', width: 90},
+          {field: 'grade_name', title: '年级', width: 90},
+          {field: 'difficulty', title: '难度', width: 100, templet: '#difficultyTpl'},
+          {field: 'error_count', title: '做错次数', width: 100, sort: true},
+          {field: 'mastered_text', title: '状态', width: 90, templet: '#masteredTpl'},
+          {field: 'create_time', title: '记录时间', width: 170},
+          {title: '操作', width: 150, fixed: 'right', toolbar: '#barDemo'}
+        ]],
+        page: true,
+        limits: [10, 20, 50, 100],
+        limit: 10
+      });
+
+      table.on('toolbar(questionTable)', function(obj){
+        var checkStatus = table.checkStatus(obj.config.id);
+        switch(obj.event){
+          case 'refresh':
+            questionTable.reload();
+          break;
+          case 'batchDelete':
+            var data = checkStatus.data;
+            if(data.length === 0){
+              layer.msg('请选择要删除的数据', {icon: 2});
+              return;
+            }
+            layer.confirm('确定要删除选中的 ' + data.length + ' 条记录吗？', function(index){
+              var ids = data.map(function(item){ return item.id; });
+              var load = layer.load(2);
+              fetch('/admin/wrong-question/delete', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ids: ids})
+              }).then(function(r){ return r.json(); })
+              .then(function(res){
+                layer.close(load);
+                layer.close(index);
+                if(res.code === 0 || res.code === 200){
+                  questionTable.reload();
+                  layer.msg('删除成功', {icon: 1});
+                } else {
+                  layer.msg(res.msg || '删除失败', {icon: 2});
+                }
+              });
+            });
+          break;
+        }
+      });
+
+      table.on('tool(questionTable)', function(obj){
+        var data = obj.data;
+        
+        if(obj.event === 'detail'){
+          layer.open({
+            type: 2,
+            title: '错题详情',
+            shadeClose: true,
+            shade: 0.5,
+            area: ['900px', '700px'],
+            content: '/admin/wrong-question/detail?id=' + data.id
+          });
+        } else if(obj.event === 'delete') {
+          layer.confirm('确定要删除这条记录吗？', function(index){
+            var load = layer.load(2);
+            fetch('/admin/wrong-question/delete', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({id: data.id})
+            }).then(function(r){ return r.json(); })
+            .then(function(res){
+              layer.close(load);
+              layer.close(index);
+              if(res.code === 0 || res.code === 200){
+                obj.del();
+                layer.msg('删除成功', {icon: 1});
+              } else {
+                layer.msg(res.msg || '删除失败', {icon: 2});
+              }
+            });
+          });
+        }
+      });
+
+      form.on('submit(search)', function(data){
+        questionTable.reload({
+          where: data.field,
+          page: { curr: 1 }
+        });
+        return false;
+      });
+    });
+
+    function previewImage(url) {
+      var preview = document.createElement('div');
+      preview.className = 'image-preview';
+      preview.innerHTML = '<span class="close-btn" onclick="this.parentElement.remove()">✕</span><img src="' + url + '">';
+      document.body.appendChild(preview);
+      preview.onclick = function(e) {
+        if(e.target === preview) preview.remove();
+      };
+    }
+  </script>
+</body>
+</html>

@@ -29,4 +29,13 @@ return [
     'error_message'    => '页面错误！请稍后再试～',
     // 显示错误信息
     'show_error_msg'   => false,
+    
+    // AI API配置
+    'ai_api_key'       => env('ai.api_key', ''),
+    'ai_api_url'       => env('ai.api_url', 'https://api.openai.com/v1/chat/completions'),
+    'ocr_api_key'      => env('ocr.api_key', ''),
+    
+    // 微信小程序配置
+    'wx_app_id'        => env('wx.app_id', ''),
+    'wx_app_secret'    => env('wx.app_secret', ''),
 ];

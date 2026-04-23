@@ -1,0 +1,96 @@
+<view class="practice-container">
+  <view class="header-section">
+    <view class="practice-banner">
+      <view class="banner-title">举一反三</view>
+      <view class="banner-desc">根据错题智能生成练习题</view>
+    </view>
+  </view>
+
+  <view class="quick-practice">
+    <view class="section-title">快速练习</view>
+    <view class="practice-options">
+      <view class="option-card" bindtap="startRandomPractice">
+        <view class="option-icon">🎲</view>
+        <view class="option-text">
+          <view class="option-title">随机练习</view>
+          <view class="option-desc">从所有试题中随机抽取</view>
+        </view>
+      </view>
+      
+      <view class="option-card" bindtap="selectSubjectPractice">
+        <view class="option-icon">📚</view>
+        <view class="option-text">
+          <view class="option-title">按科目练习</view>
+          <view class="option-desc">选择特定科目进行练习</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="wrong-questions-practice" wx:if="{{wrongQuestions.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">待练习错题</text>
+      <text class="section-more" bindtap="goToWrongList">查看全部 ›</text>
+    </view>
+    
+    <view class="question-cards">
+      <view class="question-card" wx:for="{{wrongQuestions}}" wx:key="id" bindtap="startPracticeForWrong" data-id="{{item.id}}">
+        <view class="card-tag">{{item.subject_name}}</view>
+        <view class="card-content">
+          <image class="card-image" src="{{item.image_url}}" mode="aspectFill" wx:if="{{item.image_url}}"></image>
+          <text class="card-text" wx:else>{{item.question_text}}</text>
+        </view>
+        <view class="card-footer">
+          <view class="error-count">做错{{item.error_count}}次</view>
+          <view class="practice-btn">开始练习</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="practice-history" wx:if="{{showHistory}}">
+    <view class="section-header">
+      <text class="section-title">练习记录</text>
+    </view>
+    
+    <view class="history-list">
+      <view class="history-item" wx:for="{{historyList}}" wx:key="id">
+        <view class="history-left">
+          <view class="history-icon {{item.is_correct ? 'correct' : 'wrong'}}">
+            {{item.is_correct ? '✓' : '✕'}}
+          </view>
+        </view>
+        <view class="history-right">
+          <view class="history-question">{{item.question_text}}</view>
+          <view class="history-meta">
+            <text class="history-time">{{item.create_time}}</text>
+            <text class="history-points" wx:if="{{item.points_earned > 0}}">+{{item.points_earned}}积分</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="subject-popup" wx:if="{{showSubjectPopup}}" catchtouchmove="preventTouchMove">
+    <view class="popup-mask" bindtap="closeSubjectPopup"></view>
+    <view class="popup-content">
+      <view class="popup-title">选择科目</view>
+      <view class="subject-list">
+        <view class="subject-item {{selectedSubject === 0 ? 'active' : ''}}" bindtap="confirmSubjectPractice" data-id="0">
+          全部科目
+        </view>
+        <view class="subject-item {{selectedSubject === item.id ? 'active' : ''}}" wx:for="{{subjects}}" wx:key="id" bindtap="confirmSubjectPractice" data-id="{{item.id}}">
+          {{item.name}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="points-popup" wx:if="{{showPointsAnimation}}" animation="{{pointsAnimation}}">
+    <view class="points-content">
+      <view class="points-emoji">🎉</view>
+      <view class="points-big">+{{earnedPoints}}</view>
+      <view class="points-desc">答题正确奖励</view>
+    </view>
+  </view>
+</view>

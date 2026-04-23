@@ -1,0 +1,109 @@
+<view class="answer-container">
+  <view class="progress-section">
+    <view class="progress-bar">
+      <view class="progress-fill" style="width: {{(currentIndex + 1) * 100 / questions.length}}%;"></view>
+    </view>
+    <view class="progress-text">第{{currentIndex + 1}}题 / 共{{questions.length}}题</view>
+  </view>
+
+  <view class="question-card" wx:if="{{currentQuestion}}">
+    <view class="question-header">
+      <view class="question-type">
+        <text class="tag tag-primary">{{typeText}}</text>
+        <text class="tag tag-info" wx:if="{{currentQuestion.subject_name}}">{{currentQuestion.subject_name}}</text>
+      </view>
+      <view class="question-timer">{{formatTime(usedTime)}}</view>
+    </view>
+
+    <view class="question-content">
+      <view class="question-text">{{currentQuestion.question_text}}</view>
+      
+      <view class="options-section" wx:if="{{currentQuestion.question_type <= 2}}">
+        <view class="option-item {{selectedOption === 'A' ? (showResult ? (isCorrect ? 'correct' : 'wrong') : 'selected') : ''}}" bindtap="selectOption" data-option="A" wx:if="{{currentQuestion.option_a}}">
+          <view class="option-label">A</view>
+          <view class="option-text">{{currentQuestion.option_a}}</view>
+          <view class="option-icon" wx:if="{{showResult && 'A' === currentQuestion.correct_answer}}">✓</view>
+        </view>
+        
+        <view class="option-item {{selectedOption === 'B' ? (showResult ? (isCorrect ? 'correct' : 'wrong') : 'selected') : ''}}" bindtap="selectOption" data-option="B" wx:if="{{currentQuestion.option_b}}">
+          <view class="option-label">B</view>
+          <view class="option-text">{{currentQuestion.option_b}}</view>
+          <view class="option-icon" wx:if="{{showResult && 'B' === currentQuestion.correct_answer}}">✓</view>
+        </view>
+        
+        <view class="option-item {{selectedOption === 'C' ? (showResult ? (isCorrect ? 'correct' : 'wrong') : 'selected') : ''}}" bindtap="selectOption" data-option="C" wx:if="{{currentQuestion.option_c}}">
+          <view class="option-label">C</view>
+          <view class="option-text">{{currentQuestion.option_c}}</view>
+          <view class="option-icon" wx:if="{{showResult && 'C' === currentQuestion.correct_answer}}">✓</view>
+        </view>
+        
+        <view class="option-item {{selectedOption === 'D' ? (showResult ? (isCorrect ? 'correct' : 'wrong') : 'selected') : ''}}" bindtap="selectOption" data-option="D" wx:if="{{currentQuestion.option_d}}">
+          <view class="option-label">D</view>
+          <view class="option-text">{{currentQuestion.option_d}}</view>
+          <view class="option-icon" wx:if="{{showResult && 'D' === currentQuestion.correct_answer}}">✓</view>
+        </view>
+      </view>
+
+      <view class="input-section" wx:if="{{currentQuestion.question_type >= 3}}">
+        <textarea class="answer-input" placeholder="请输入答案" value="{{userAnswer}}" bindinput="onAnswerInput" disabled="{{showResult}}"></textarea>
+      </view>
+    </view>
+
+    <view class="result-section" wx:if="{{showResult}}">
+      <view class="result-badge {{isCorrect ? 'correct' : 'wrong'}}">
+        <text class="result-icon">{{isCorrect ? '✓' : '✕'}}</text>
+        <text class="result-text">{{isCorrect ? '回答正确' : '回答错误'}}</text>
+      </view>
+      
+      <view class="answer-detail">
+        <view class="detail-row">
+          <text class="detail-label">正确答案：</text>
+          <text class="detail-value">{{currentQuestion.correct_answer}}</text>
+        </view>
+        <view class="detail-row" wx:if="{{currentQuestion.answer_text}}">
+          <text class="detail-label">解析：</text>
+          <text class="detail-value">{{currentQuestion.answer_text}}</text>
+        </view>
+      </view>
+
+      <view class="points-reward" wx:if="{{isCorrect && earnedPoints > 0}}">
+        <view class="reward-icon">⭐</view>
+        <view class="reward-text">
+          <text class="reward-number">+{{earnedPoints}}</text>
+          <text class="reward-label">积分</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="action-section">
+    <view class="btn-outline action-btn" wx:if="{{currentIndex > 0 && !showResult}}" bindtap="prevQuestion">
+      上一题
+    </view>
+    
+    <view class="btn-primary action-btn" wx:if="{{!showResult}}" bindtap="submitAnswer">
+      提交答案
+    </view>
+    
+    <view class="btn-primary action-btn" wx:if="{{showResult && currentIndex < questions.length - 1}}" bindtap="nextQuestion">
+      下一题
+    </view>
+    
+    <view class="btn-primary action-btn" wx:if="{{showResult && currentIndex >= questions.length - 1}}" bindtap="finishPractice">
+      完成练习
+    </view>
+  </view>
+
+  <view class="points-popup" wx:if="{{showPointsAnimation}}" animation="{{pointsAnimation}}">
+    <view class="points-content">
+      <view class="points-emoji">🎉</view>
+      <view class="points-big">+{{earnedPoints}}</view>
+      <view class="points-desc">答题正确奖励</view>
+    </view>
+  </view>
+
+  <view class="coin-fly" wx:if="{{showCoinAnimation}}">
+    <view class="coin" wx:for="{{coinCount}}" wx:key="index" style="animation: fly 1s ease {{index * 0.1}}s forwards; left: {{300 + index * 30}}rpx; top: 50%;">
+    </view>
+  </view>
+</view>

@@ -1,0 +1,100 @@
+<view class="add-container">
+  <view class="photo-section">
+    <view class="photo-area" wx:if="{{!imagePath}}" bindtap="chooseImage">
+      <view class="photo-placeholder">
+        <text class="photo-icon">📷</text>
+        <text class="photo-text">点击拍照或上传错题</text>
+      </view>
+    </view>
+    <view class="photo-preview" wx:else>
+      <image class="preview-image" src="{{imagePath}}" mode="aspectFill"></image>
+      <view class="photo-actions">
+        <view class="action-btn retake-btn" bindtap="chooseImage">
+          <text class="btn-text">重拍</text>
+        </view>
+        <view class="action-btn confirm-btn" bindtap="confirmPhoto">
+          <text class="btn-text">确认</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="form-section" wx:if="{{showForm}}">
+    <view class="form-item">
+      <view class="form-label">科目</view>
+      <picker class="form-picker" mode="selector" range="{{subjects}}" range-key="name" value="{{subjectIndex}}" bindchange="onSubjectChange">
+        <view class="picker-value">
+          {{subjects[subjectIndex] ? subjects[subjectIndex].name : '请选择科目'}}
+          <text class="picker-arrow">›</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">题目内容</view>
+      <textarea class="form-textarea" placeholder="请输入题目内容（AI识别后可编辑）" value="{{questionText}}" bindinput="onQuestionInput" maxlength="500"></textarea>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">正确答案</view>
+      <textarea class="form-textarea" placeholder="请输入正确答案" value="{{answerText}}" bindinput="onAnswerInput" maxlength="200"></textarea>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">解析</view>
+      <textarea class="form-textarea" placeholder="请输入解析（选填）" value="{{analysis}}" bindinput="onAnalysisInput" maxlength="500"></textarea>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">知识点</view>
+      <input class="form-input" placeholder="多个知识点用逗号分隔" value="{{knowledgePoints}}" bindinput="onKnowledgeInput" />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">难度</view>
+      <view class="difficulty-selector">
+        <view class="difficulty-item {{difficulty === 1 ? 'active' : ''}}" bindtap="selectDifficulty" data-level="1">
+          <text class="star">★</text>
+          <text class="level-text">简单</text>
+        </view>
+        <view class="difficulty-item {{difficulty === 2 ? 'active' : ''}}" bindtap="selectDifficulty" data-level="2">
+          <text class="star">★★</text>
+          <text class="level-text">中等</text>
+        </view>
+        <view class="difficulty-item {{difficulty === 3 ? 'active' : ''}}" bindtap="selectDifficulty" data-level="3">
+          <text class="star">★★★</text>
+          <text class="level-text">困难</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">题目来源</view>
+      <input class="form-input" placeholder="如：作业本、试卷等（选填）" value="{{source}}" bindinput="onSourceInput" />
+    </view>
+  </view>
+
+  <view class="submit-section" wx:if="{{showForm}}">
+    <view class="btn-primary submit-btn" bindtap="submitQuestion">
+      保存错题
+    </view>
+    <view class="btn-outline submit-btn" bindtap="submitAndPractice" wx:if="{{questionText}}">
+      保存并开始练习
+    </view>
+  </view>
+
+  <view class="analyzing-overlay" wx:if="{{analyzing}}">
+    <view class="analyzing-content">
+      <view class="loading-spinner"></view>
+      <text class="analyzing-text">AI正在识别题目...</text>
+    </view>
+  </view>
+
+  <view class="points-popup" wx:if="{{showPointsAnimation}}" animation="{{pointsAnimation}}">
+    <view class="points-content">
+      <view class="points-emoji">🎉</view>
+      <view class="points-big">+10</view>
+      <view class="points-desc">新增错题奖励</view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,82 @@
+<view class="points-container">
+  <view class="header-section">
+    <view class="points-banner">
+      <view class="points-icon">⭐</view>
+      <view class="points-info">
+        <view class="points-title">当前积分</view>
+        <view class="points-number">{{userInfo.points || 0}}</view>
+      </view>
+      <view class="points-total">
+        <view class="total-label">累计获得</view>
+        <view class="total-number">{{userInfo.total_points || 0}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="stats-section">
+    <view class="stats-card">
+      <view class="stats-item">
+        <view class="stats-number">{{statistics.total_earned || 0}}</view>
+        <view class="stats-label">总获得积分</view>
+      </view>
+      <view class="stats-divider"></view>
+      <view class="stats-item">
+        <view class="stats-number">{{statistics.correct_count || 0}}</view>
+        <view class="stats-label">正确答题数</view>
+      </view>
+      <view class="stats-divider"></view>
+      <view class="stats-item">
+        <view class="stats-number">{{statistics.checkin_count || 0}}</view>
+        <view class="stats-label">签到次数</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="log-section">
+    <view class="section-header">
+      <text class="section-title">积分明细</text>
+      <view class="type-filter">
+        <view class="filter-item {{currentType === 0 ? 'active' : ''}}" bindtap="selectType" data-type="0">全部</view>
+        <view class="filter-item {{currentType === 1 ? 'active' : ''}}" bindtap="selectType" data-type="1">答题</view>
+        <view class="filter-item {{currentType === 3 ? 'active' : ''}}" bindtap="selectType" data-type="3">签到</view>
+      </view>
+    </view>
+
+    <view class="log-list">
+      <view class="log-item" wx:for="{{logList}}" wx:key="id">
+        <view class="log-icon {{item.points > 0 ? 'plus' : 'minus'}}">
+          {{item.points > 0 ? '+' : ''}}
+        </view>
+        <view class="log-content">
+          <view class="log-desc">{{item.description}}</view>
+          <view class="log-time">{{item.create_time}}</view>
+        </view>
+        <view class="log-points {{item.points > 0 ? 'plus' : 'minus'}}">
+          {{item.points > 0 ? '+' : ''}}{{item.points}}
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{logList.length === 0 && !loading}}">
+      <view class="empty-icon">📋</view>
+      <view class="empty-text">暂无积分记录</view>
+      <view class="empty-tip">答题正确和签到都能获得积分哦</view>
+    </view>
+
+    <view class="loading-more" wx:if="{{loading}}">
+      <text>加载中...</text>
+    </view>
+
+    <view class="no-more" wx:if="{{noMore && logList.length > 0}}">
+      <text>没有更多了</text>
+    </view>
+  </view>
+
+  <view class="points-popup" wx:if="{{showPointsAnimation}}" animation="{{pointsAnimation}}">
+    <view class="points-content">
+      <view class="points-emoji">🎉</view>
+      <view class="points-big">+{{earnedPoints}}</view>
+      <view class="points-desc">积分到账</view>
+    </view>
+  </view>
+</view>

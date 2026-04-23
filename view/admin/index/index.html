@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>首页 - 错题本管理系统</title>
+  <link rel="stylesheet" href="/static/layui/css/layui.css">
+  <style>
+    .welcome-body {
+      padding: 20px;
+      background-color: #f2f2f2;
+      min-height: calc(100vh - 110px);
+    }
+    .welcome-container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+    .stat-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-right: 20px;
+    }
+    .stat-icon.user {
+      background: linear-gradient(135deg, #4CAF50, #8BC34A);
+    }
+    .stat-icon.question {
+      background: linear-gradient(135deg, #2196F3, #03A9F4);
+    }
+    .stat-icon.exam {
+      background: linear-gradient(135deg, #9C27B0, #E040FB);
+    }
+    .stat-icon.points {
+      background: linear-gradient(135deg, #FF9800, #FFC107);
+    }
+    .stat-info {
+      flex: 1;
+    }
+    .stat-value {
+      font-size: 32px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 5px;
+    }
+    .stat-label {
+      font-size: 14px;
+      color: #999;
+    }
+    .stat-trend {
+      font-size: 12px;
+      margin-top: 5px;
+    }
+    .stat-trend.up {
+      color: #4CAF50;
+    }
+    .stat-trend.down {
+      color: #f56c6c;
+    }
+    .chart-section {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .chart-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    }
+    .chart-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .list-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    }
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    .list-item:last-child {
+      border-bottom: none;
+    }
+    .list-label {
+      font-size: 14px;
+      color: #666;
+    }
+    .list-value {
+      font-size: 16px;
+      font-weight: 500;
+      color: #333;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #f0f0f0;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+    @media (max-width: 992px) {
+      .chart-section {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="welcome-body">
+    <div class="welcome-container">
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="stat-icon user">👥</div>
+          <div class="stat-info">
+            <div class="stat-value">{$statistics.user_count}</div>
+            <div class="stat-label">用户总数</div>
+            <div class="stat-trend up">今日新增 {$statistics.today_user} 人</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon question">📝</div>
+          <div class="stat-info">
+            <div class="stat-value">{$statistics.wrong_question_count}</div>
+            <div class="stat-label">错题总数</div>
+            <div class="stat-trend">系统收录的所有错题</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon exam">📊</div>
+          <div class="stat-info">
+            <div class="stat-value">{$statistics.exam_count}</div>
+            <div class="stat-label">练习次数</div>
+            <div class="stat-trend">学生进行的答题练习</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon points">⭐</div>
+          <div class="stat-info">
+            <div class="stat-value">{$statistics.points_total}</div>
+            <div class="stat-label">发放积分</div>
+            <div class="stat-trend">已发放的积分总数</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-section">
+        <div class="chart-card">
+          <div class="chart-title">用户增长趋势（近7天）</div>
+          <div id="userChart" style="height: 300px;"></div>
+        </div>
+        <div class="list-card">
+          <div class="chart-title">各年级用户分布</div>
+          {volist name="gradeUsers" id="vo"}
+          <div class="list-item">
+            <span class="list-label">{$vo.name}</span>
+            <span class="list-value">{$vo.users_count}</span>
+          </div>
+          {/volist}
+        </div>
+      </div>
+
+      <div class="chart-section">
+        <div class="list-card">
+          <div class="chart-title">各科目错题统计</div>
+          {volist name="subjectStats" id="vo"}
+          <div class="list-item">
+            <div style="flex: 1;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                <span class="list-label">{$vo.name}</span>
+                <span class="list-value">{$vo.wrong_questions_count} 道</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 0%; background: linear-gradient(90deg, #4CAF50, #8BC34A);" data-value="{$vo.wrong_questions_count}"></div>
+              </div>
+            </div>
+          </div>
+          {/volist}
+        </div>
+        <div class="list-card">
+          <div class="chart-title">系统概览</div>
+          <div class="list-item">
+            <span class="list-label">试题总数</span>
+            <span class="list-value">{$statistics.question_count}</span>
+          </div>
+          <div class="list-item">
+            <span class="list-label">今日新增用户</span>
+            <span class="list-value">{$statistics.today_user}</span>
+          </div>
+          <div class="list-item">
+            <span class="list-label">累计发放积分</span>
+            <span class="list-value text-green">{$statistics.points_total}</span>
+          </div>
+          <div class="list-item">
+            <span class="list-label">用户练习次数</span>
+            <span class="list-value">{$statistics.exam_count}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/layui/layui.js"></script>
+  <script>
+    layui.use(['layer', 'echarts'], function(){
+      var layer = layui.layer;
+      
+      var userTrendData = {$userTrend|json_encode};
+      
+      if(typeof echarts !== 'undefined') {
+        var userChart = echarts.init(document.getElementById('userChart'));
+        
+        var dates = userTrendData.map(function(item){ return item.date; });
+        var counts = userTrendData.map(function(item){ return item.count; });
+        
+        var option = {
+          tooltip: {
+            trigger: 'axis',
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            textStyle: {
+              color: '#333'
+            }
+          },
+          grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+          },
+          xAxis: {
+            type: 'category',
+            data: dates,
+            axisLine: {
+              lineStyle: {
+                color: '#e0e0e0'
+              }
+            }
+          },
+          yAxis: {
+            type: 'value',
+            splitLine: {
+              lineStyle: {
+                color: '#f0f0f0'
+              }
+            }
+          },
+          series: [{
+            data: counts,
+            type: 'line',
+            smooth: true,
+            symbol: 'circle',
+            symbolSize: 8,
+            lineStyle: {
+              color: '#4CAF50',
+              width: 3
+            },
+            itemStyle: {
+              color: '#4CAF50'
+            },
+            areaStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: 'rgba(76, 175, 80, 0.3)' },
+                { offset: 1, color: 'rgba(76, 175, 80, 0.05)' }
+              ])
+            }
+          }]
+        };
+        
+        userChart.setOption(option);
+        
+        window.addEventListener('resize', function() {
+          userChart.resize();
+        });
+      }
+      
+      setTimeout(function() {
+        var progressBars = document.querySelectorAll('.progress-fill');
+        var maxValue = 0;
+        progressBars.forEach(function(bar) {
+          var val = parseInt(bar.getAttribute('data-value')) || 0;
+          if(val > maxValue) maxValue = val;
+        });
+        progressBars.forEach(function(bar) {
+          var val = parseInt(bar.getAttribute('data-value')) || 0;
+          var percent = maxValue > 0 ? (val / maxValue * 100) : 0;
+          bar.style.width = percent + '%';
+        });
+      }, 100);
+    });
+  </script>
+</body>
+</html>

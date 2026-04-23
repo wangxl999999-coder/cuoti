@@ -1,0 +1,112 @@
+<view class="detail-container">
+  <view class="collection-info" wx:if="{{collection}}">
+    <view class="info-header">
+      <view class="info-icon">📁</view>
+      <view class="info-text">
+        <view class="info-name">{{collection.name}}</view>
+        <view class="info-desc">{{collection.description || '暂无描述'}}</view>
+      </view>
+    </view>
+    <view class="info-stats">
+      <view class="stat-item">
+        <view class="stat-number">{{collection.question_count || 0}}</view>
+        <view class="stat-label">题目数量</view>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <view class="stat-number">{{masteredCount}}</view>
+        <view class="stat-label">已掌握</view>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <view class="stat-number">{{notMasteredCount}}</view>
+        <view class="stat-label">待掌握</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="action-section">
+    <view class="action-btn btn-primary" bindtap="startPracticeAll">
+      <text>开始练习全部</text>
+    </view>
+    <view class="action-btn btn-outline" bindtap="showAddQuestion">
+      <text>添加错题</text>
+    </view>
+  </view>
+
+  <view class="filter-section">
+    <view class="filter-item {{currentFilter === 'all' ? 'active' : ''}}" bindtap="filterQuestions" data-filter="all">
+      全部
+    </view>
+    <view class="filter-item {{currentFilter === 'mastered' ? 'active' : ''}}" bindtap="filterQuestions" data-filter="mastered">
+      已掌握
+    </view>
+    <view class="filter-item {{currentFilter === 'not_mastered' ? 'active' : ''}}" bindtap="filterQuestions" data-filter="not_mastered">
+      待掌握
+    </view>
+  </view>
+
+  <view class="questions-section">
+    <view class="question-item" wx:for="{{questions}}" wx:key="id" bindtap="goToQuestion" data-id="{{item.wrong_question_id}}">
+      <view class="question-left">
+        <view class="question-num">{{index + 1}}</view>
+      </view>
+      <view class="question-content">
+        <view class="question-text">{{item.question_text || '查看详情'}}</view>
+        <view class="question-meta">
+          <text class="meta-tag tag-primary" wx:if="{{item.subject_name}}">{{item.subject_name}}</text>
+          <text class="meta-tag {{item.is_mastered ? 'tag-success' : 'tag-warning'}}">{{item.is_mastered ? '已掌握' : '待掌握'}}</text>
+          <text class="meta-text">{{item.create_time}}</text>
+        </view>
+      </view>
+      <view class="question-actions" catchtap="stopPropagation">
+        <view class="action-icon remove" bindtap="removeQuestion" data-id="{{item.id}}">🗑️</view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{questions.length === 0 && !loading}}">
+      <view class="empty-icon">📝</view>
+      <view class="empty-text">暂无错题</view>
+      <view class="empty-tip">点击上方按钮添加错题到本错题本</view>
+    </view>
+
+    <view class="loading-more" wx:if="{{loading}}">
+      <text>加载中...</text>
+    </view>
+
+    <view class="no-more" wx:if="{{noMore && questions.length > 0}}">
+      <text>没有更多了</text>
+    </view>
+  </view>
+
+  <view class="add-question-popup" wx:if="{{showAddPopup}}" catchtouchmove="preventMove">
+    <view class="popup-mask" bindtap="closeAddPopup"></view>
+    <view class="popup-content">
+      <view class="popup-header">
+        <text class="popup-title">添加错题</text>
+        <text class="popup-close" bindtap="closeAddPopup">✕</text>
+      </view>
+      <view class="popup-body">
+        <view class="search-section">
+          <input class="search-input" placeholder="搜索错题" value="{{searchKeyword}}" bindinput="onSearchInput" />
+        </view>
+        <view class="select-list">
+          <view class="select-item" wx:for="{{availableQuestions}}" wx:key="id">
+            <checkbox class="select-checkbox" value="{{item.id}}" checked="{{selectedIds.includes(item.id)}}" bindchange="toggleSelect" data-id="{{item.id}}" color="#4CAF50" />
+            <view class="select-content">
+              <view class="select-text">{{item.question_text || '错题'}}</view>
+              <view class="select-meta">
+                <text class="tag tag-primary">{{item.subject_name}}</text>
+                <text class="tag tag-info">{{item.grade_name}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="popup-footer">
+        <view class="btn-outline" bindtap="closeAddPopup">取消</view>
+        <view class="btn-primary" bindtap="submitAdd">确定 ({{selectedIds.length}})</view>
+      </view>
+    </view>
+  </view>
+</view>

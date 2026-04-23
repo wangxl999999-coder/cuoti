@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登录 - 错题本管理系统</title>
+  <link rel="stylesheet" href="/static/layui/css/layui.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-container {
+      width: 400px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+    .login-header {
+      background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+      padding: 40px;
+      text-align: center;
+    }
+    .login-header .logo {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+    .login-header .title {
+      font-size: 24px;
+      color: #fff;
+      font-weight: bold;
+    }
+    .login-header .subtitle {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.8);
+      margin-top: 5px;
+    }
+    .login-body {
+      padding: 40px;
+    }
+    .login-form .layui-form-item {
+      margin-bottom: 25px;
+    }
+    .login-form .layui-input {
+      height: 45px;
+      border-radius: 8px;
+      padding-left: 40px;
+    }
+    .login-form .layui-input:focus {
+      border-color: #4CAF50;
+      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+    }
+    .login-form .layui-input-wrap .layui-input-prefix {
+      height: 45px;
+      line-height: 45px;
+      width: 40px;
+      color: #999;
+    }
+    .login-btn {
+      width: 100%;
+      height: 45px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+      border: none;
+      font-size: 16px;
+      font-weight: 500;
+    }
+    .login-btn:hover {
+      opacity: 0.9;
+    }
+    .tips {
+      text-align: center;
+      margin-top: 20px;
+      color: #999;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-header">
+      <div class="logo">📚</div>
+      <div class="title">错题本管理系统</div>
+      <div class="subtitle">拍照记录错题，AI智能学习</div>
+    </div>
+    <div class="login-body">
+      <form class="layui-form login-form" id="loginForm">
+        <div class="layui-form-item">
+          <div class="layui-input-wrap">
+            <i class="layui-icon layui-icon-username layui-input-prefix"></i>
+            <input type="text" name="username" lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <div class="layui-input-wrap">
+            <i class="layui-icon layui-icon-password layui-input-prefix"></i>
+            <input type="password" name="password" lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <button class="layui-btn login-btn" lay-submit lay-filter="login">登 录</button>
+        </div>
+        <div class="tips">
+          默认账号：admin / 密码：123456
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/static/layui/layui.js"></script>
+  <script>
+    layui.use(['form', 'layer'], function(){
+      var form = layui.form;
+      var layer = layui.layer;
+
+      form.on('submit(login)', function(data){
+        var load = layer.load(2);
+        
+        fetch('/admin/login/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data.field)
+        }).then(function(response){
+          return response.json();
+        }).then(function(res){
+          layer.close(load);
+          if(res.code === 0 || res.code === 200){
+            layer.msg('登录成功', {icon: 1, time: 1500}, function(){
+              location.href = '/admin/index';
+            });
+          } else {
+            layer.msg(res.msg || '登录失败', {icon: 2});
+          }
+        }).catch(function(err){
+          layer.close(load);
+          layer.msg('网络错误', {icon: 2});
+        });
+        
+        return false;
+      });
+    });
+  </script>
+</body>
+</html>

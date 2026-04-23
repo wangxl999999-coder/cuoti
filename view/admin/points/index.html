@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>积分管理 - 错题本管理系统</title>
+  <link rel="stylesheet" href="/static/layui/css/layui.css">
+  <style>
+    .page-container {
+      padding: 20px;
+    }
+    .search-form {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .points-plus {
+      color: #4CAF50;
+      font-weight: bold;
+    }
+    .points-minus {
+      color: #f56c6c;
+      font-weight: bold;
+    }
+    .type-badge {
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .type-answer { background: #e8f5e9; color: #4CAF50; }
+    .type-checkin { background: #e3f2fd; color: #2196f3; }
+    .type-master { background: #fff3e0; color: #e6a23c; }
+    .type-register { background: #f3e5f5; color: #9c27b0; }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <form class="layui-form search-form" id="searchForm">
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label">关键词</label>
+          <div class="layui-input-inline">
+            <input type="text" name="keyword" placeholder="手机号/昵称" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">类型</label>
+          <div class="layui-input-inline">
+            <select name="type">
+              <option value="0">全部类型</option>
+              <option value="1">答题奖励</option>
+              <option value="2">连续答题奖励</option>
+              <option value="3">签到奖励</option>
+              <option value="4">连续签到奖励</option>
+              <option value="5">掌握奖励</option>
+              <option value="6">新用户奖励</option>
+            </select>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <button class="layui-btn layui-btn-normal" lay-submit lay-filter="search">
+            <i class="layui-icon layui-icon-search"></i> 搜索
+          </button>
+          <button type="reset" class="layui-btn layui-btn-primary">
+            <i class="layui-icon layui-icon-refresh"></i> 重置
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <table class="layui-hide" id="pointsTable" lay-filter="pointsTable"></table>
+
+    <script type="text/html" id="toolbarDemo">
+      <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="refresh">
+          <i class="layui-icon layui-icon-refresh"></i> 刷新
+        </button>
+      </div>
+    </script>
+
+    <script type="text/html" id="pointsTpl">
+      <span class="{{d.points > 0 ? 'points-plus' : 'points-minus'}}">
+        {{d.points > 0 ? '+' : ''}}{{d.points}}
+      </span>
+    </script>
+
+    <script type="text/html" id="typeTpl">
+      {{# 
+        var typeClass = '';
+        if(d.type === 1 || d.type === 2) typeClass = 'type-answer';
+        else if(d.type === 3 || d.type === 4) typeClass = 'type-checkin';
+        else if(d.type === 5) typeClass = 'type-master';
+        else if(d.type === 6) typeClass = 'type-register';
+      }}
+      <span class="type-badge {{typeClass}}">{{d.type_name}}</span>
+    </script>
+  </div>
+
+  <script src="/static/layui/layui.js"></script>
+  <script>
+    layui.use(['table', 'form', 'layer'], function(){
+      var table = layui.table;
+      var form = layui.form;
+      var layer = layui.layer;
+
+      var pointsTable = table.render({
+        elem: '#pointsTable',
+        url: '/admin/points/list',
+        toolbar: '#toolbarDemo',
+        defaultToolbar: ['filter', 'print', 'exports'],
+        cols: [[
+          {field: 'id', title: 'ID', width: 80, sort: true},
+          {field: 'user_name', title: '用户', width: 120},
+          {field: 'user_phone', title: '手机号', width: 130},
+          {field: 'type_name', title: '类型', width: 120, templet: '#typeTpl'},
+          {field: 'points', title: '积分变动', width: 100, templet: '#pointsTpl', sort: true},
+          {field: 'description', title: '描述', width: 300},
+          {field: 'create_time', title: '时间', width: 170, sort: true}
+        ]],
+        page: true,
+        limits: [10, 20, 50, 100],
+        limit: 10
+      });
+
+      table.on('toolbar(pointsTable)', function(obj){
+        switch(obj.event){
+          case 'refresh':
+            pointsTable.reload();
+          break;
+        }
+      });
+
+      form.on('submit(search)', function(data){
+        pointsTable.reload({
+          where: data.field,
+          page: { curr: 1 }
+        });
+        return false;
+      });
+    });
+  </script>
+</body>
+</html>

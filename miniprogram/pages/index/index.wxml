@@ -1,0 +1,105 @@
+<view class="index-container">
+  <view class="header-section">
+    <view class="user-info">
+      <image class="avatar" src="{{userInfo.avatar || '/assets/default-avatar.png'}}" mode="aspectFill" wx:if="{{userInfo}}"></image>
+      <view class="avatar-placeholder" wx:else>{{userInfo.nickname ? userInfo.nickname.charAt(0) : '用'}}</view>
+      <view class="user-text">
+        <view class="nickname">{{userInfo.nickname || '用户'}}</view>
+        <view class="grade">{{userInfo.grade_name || ''}}</view>
+      </view>
+      <view class="points-badge" bindtap="goToPoints">
+        <text class="points-icon">⭐</text>
+        <text class="points-number">{{userInfo.points || 0}}</text>
+      </view>
+    </view>
+
+    <view class="checkin-card" wx:if="{{checkinInfo && !checkinInfo.is_checked}}" bindtap="doCheckin">
+      <view class="checkin-left">
+        <view class="checkin-title">每日签到</view>
+        <view class="checkin-desc">连续签到{{checkinInfo.continuous_days}}天，可获{{checkinInfo.today_points}}积分</view>
+      </view>
+      <view class="checkin-btn">
+        签到
+      </view>
+    </view>
+
+    <view class="checked-card" wx:if="{{checkinInfo && checkinInfo.is_checked}}">
+      <view class="checked-icon">✓</view>
+      <view class="checked-text">
+        <view class="checked-title">今日已签到</view>
+        <view class="checked-desc">连续签到{{checkinInfo.continuous_days}}天</view>
+      </view>
+      <view class="checked-points">
+        +{{checkinInfo.today_points}}
+      </view>
+    </view>
+  </view>
+
+  <view class="quick-actions">
+    <view class="action-item" bindtap="goToAddQuestion">
+      <view class="action-icon add-icon">📷</view>
+      <text class="action-text">拍照录题</text>
+    </view>
+    <view class="action-item" bindtap="goToWrongList">
+      <view class="action-icon list-icon">📚</view>
+      <text class="action-text">我的错题</text>
+    </view>
+    <view class="action-item" bindtap="goToPractice">
+      <view class="action-icon practice-icon">✏️</view>
+      <text class="action-text">开始练习</text>
+    </view>
+    <view class="action-item" bindtap="goToCollection">
+      <view class="action-icon collection-icon">📁</view>
+      <text class="action-text">错题本</text>
+    </view>
+  </view>
+
+  <view class="statistics-section">
+    <view class="section-header">
+      <text class="section-title">学习统计</text>
+    </view>
+    <view class="stats-grid">
+      <view class="stat-item">
+        <view class="stat-number">{{statistics.total || 0}}</view>
+        <view class="stat-label">错题总数</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-number text-success">{{statistics.mastered || 0}}</view>
+        <view class="stat-label">已掌握</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-number text-warning">{{statistics.unmastered || 0}}</view>
+        <view class="stat-label">待掌握</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-number text-primary">{{statistics.mastered_rate || 0}}%</view>
+        <view class="stat-label">掌握率</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="subject-section" wx:if="{{statistics.subject_list && statistics.subject_list.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">各科错题</text>
+    </view>
+    <view class="subject-list">
+      <view class="subject-item" wx:for="{{statistics.subject_list}}" wx:key="name">
+        <view class="subject-name">{{item.name}}</view>
+        <view class="subject-progress">
+          <view class="progress-bar">
+            <view class="progress-fill" style="width: {{item.count * 100 / maxSubjectCount}}%;"></view>
+          </view>
+          <text class="progress-count">{{item.count}}道</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="points-popup" wx:if="{{showPointsAnimation}}" animation="{{pointsAnimation}}">
+    <view class="points-content">
+      <view class="points-emoji">🎉</view>
+      <view class="points-big">+{{earnedPoints}}</view>
+      <view class="points-desc">积分到账</view>
+    </view>
+  </view>
+</view>
