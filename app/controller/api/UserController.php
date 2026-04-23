@@ -243,6 +243,6 @@ class UserController extends BaseApiController
     
     private function generateToken()
     {
-        return md5(uniqid(mt_rand(), true));
+        return md5(uniqid((string)mt_rand(), true));
     }
 }

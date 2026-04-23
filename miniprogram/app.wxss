@@ -26,6 +26,7 @@ page {
   text-align: center;
   font-size: 32rpx;
   font-weight: 500;
+  box-sizing: border-box;
 }
 
 .btn-primary:active {
@@ -37,11 +38,12 @@ page {
   color: #4CAF50;
   border-radius: 40rpx;
   height: 88rpx;
-  line-height: 88rpx;
+  line-height: 84rpx;
   text-align: center;
   font-size: 32rpx;
   font-weight: 500;
   background-color: #fff;
+  box-sizing: border-box;
 }
 
 .text-primary {
