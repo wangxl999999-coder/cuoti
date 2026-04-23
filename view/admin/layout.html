@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>错题本管理系统</title>
+  <link rel="stylesheet" href="/static/layui/css/layui.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    .layui-layout-admin .layui-logo {
+      color: #fff;
+      font-size: 18px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+    }
+    .layui-layout-admin .layui-logo .logo-icon {
+      margin-right: 8px;
+    }
+    .layui-layout-admin .layui-header {
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+    }
+    .layui-layout-admin .layui-header .layui-nav {
+      background: transparent;
+    }
+    .layui-layout-admin .layui-header .layui-nav .layui-nav-item {
+      line-height: 60px;
+    }
+    .layui-layout-admin .layui-header .layui-nav .layui-nav-item a {
+      color: rgba(255, 255, 255, 0.9);
+    }
+    .layui-layout-admin .layui-header .layui-nav .layui-nav-item a:hover {
+      color: #fff;
+    }
+    .layui-layout-admin .layui-side {
+      top: 60px;
+    }
+    .layui-side-scroll {
+      width: 220px;
+    }
+    .layui-side-menu {
+      width: 220px;
+    }
+    .layui-nav-tree {
+      width: 220px;
+    }
+    .layui-nav-tree .layui-nav-item a {
+      height: 50px;
+      line-height: 50px;
+    }
+    .layui-nav-tree .layui-nav-item a i {
+      margin-right: 8px;
+    }
+    .layui-nav-tree .layui-nav-item a:hover {
+      background: rgba(76, 175, 80, 0.1);
+    }
+    .layui-nav-tree .layui-this > a {
+      background: rgba(76, 175, 80, 0.15) !important;
+    }
+    .layui-nav-tree .layui-nav-child dd.layui-this a,
+    .layui-nav-tree .layui-nav-child dd.layui-this {
+      background: rgba(76, 175, 80, 0.1) !important;
+      color: #4CAF50;
+    }
+    .layui-body {
+      top: 60px;
+      left: 220px;
+      bottom: 0;
+      overflow: hidden;
+    }
+    .layui-body iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .layui-footer {
+      left: 220px;
+      text-align: center;
+      background: #f8f9fa;
+      color: #999;
+      font-size: 12px;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+    }
+    .user-info .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      margin-right: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: bold;
+    }
+    .user-info .user-name {
+      color: #fff;
+      margin-right: 10px;
+    }
+    .menu-icon {
+      width: 20px;
+      display: inline-block;
+      text-align: center;
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body class="layui-layout-body">
+  <div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+      <div class="layui-logo">
+        <span class="logo-icon">📚</span>
+        错题本管理系统
+      </div>
+      <ul class="layui-nav layui-layout-right">
+        <li class="layui-nav-item">
+          <div class="user-info">
+            <div class="user-avatar">{$adminInfo.nickname ? mb_substr($adminInfo.nickname, 0, 1) : 'A'}</div>
+            <span class="user-name">{$adminInfo.nickname ? $adminInfo.nickname : $adminInfo.username}</span>
+          </div>
+          <dl class="layui-nav-child">
+            <dd><a href="javascript:;" onclick="layer.msg('个人设置开发中', {icon: 6})">个人设置</a></dd>
+            <dd><a href="javascript:;" onclick="logout()">退出登录</a></dd>
+          </dl>
+        </li>
+      </ul>
+    </div>
+
+    <div class="layui-side layui-bg-black">
+      <div class="layui-side-scroll">
+        <ul class="layui-nav layui-nav-tree" lay-filter="sideMenu">
+          <li class="layui-nav-item layui-this">
+            <a href="javascript:;" data-url="/admin/index">
+              <i class="layui-icon layui-icon-home menu-icon"></i>首页
+            </a>
+          </li>
+          <li class="layui-nav-item">
+            <a href="javascript:;">
+              <i class="layui-icon layui-icon-user menu-icon"></i>用户管理
+            </a>
+            <dl class="layui-nav-child">
+              <dd><a href="javascript:;" data-url="/admin/user">用户列表</a></dd>
+            </dl>
+          </li>
+          <li class="layui-nav-item">
+            <a href="javascript:;">
+              <i class="layui-icon layui-icon-list menu-icon"></i>错题管理
+            </a>
+            <dl class="layui-nav-child">
+              <dd><a href="javascript:;" data-url="/admin/wrong-question">错题列表</a></dd>
+            </dl>
+          </li>
+          <li class="layui-nav-item">
+            <a href="javascript:;">
+              <i class="layui-icon layui-icon-diamond menu-icon"></i>积分管理
+            </a>
+            <dl class="layui-nav-child">
+              <dd><a href="javascript:;" data-url="/admin/points">积分明细</a></dd>
+            </dl>
+          </li>
+          <li class="layui-nav-item">
+            <a href="javascript:;" data-url="javascript:;">
+              <i class="layui-icon layui-icon-set menu-icon"></i>系统设置
+            </a>
+            <dl class="layui-nav-child">
+              <dd><a href="javascript:;" onclick="layer.msg('开发中', {icon: 6})">年级管理</a></dd>
+              <dd><a href="javascript:;" onclick="layer.msg('开发中', {icon: 6})">科目管理</a></dd>
+              <dd><a href="javascript:;" onclick="layer.msg('开发中', {icon: 6})">积分规则</a></dd>
+            </dl>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="layui-body" id="mainContent">
+      <iframe src="/admin/index" id="mainIframe" name="mainIframe" frameborder="0"></iframe>
+    </div>
+
+    <div class="layui-footer">
+      Copyright © 2024 错题本管理系统 v1.0.0
+    </div>
+  </div>
+
+  <script src="/static/layui/layui.js"></script>
+  <script>
+    layui.use(['element', 'layer'], function(){
+      var element = layui.element;
+      var layer = layui.layer;
+      var $ = layui.$;
+
+      $('.layui-nav-item a[data-url]').on('click', function(){
+        var url = $(this).attr('data-url');
+        if(url && url !== 'javascript:;'){
+          $('#mainIframe').attr('src', url);
+          
+          $('.layui-nav-item').removeClass('layui-this');
+          $('.layui-nav-child dd').removeClass('layui-this');
+          $(this).parent().addClass('layui-this');
+          if($(this).parent().parent().hasClass('layui-nav-child')){
+            $(this).parent().parent().parent().addClass('layui-this');
+          }
+        }
+      });
+    });
+
+    function logout() {
+      layui.use(['layer'], function(){
+        var layer = layui.layer;
+        layer.confirm('确定要退出登录吗？', function(index){
+          layer.close(index);
+          location.href = '/admin/login/logout';
+        });
+      });
+    }
+  </script>
+</body>
+</html>

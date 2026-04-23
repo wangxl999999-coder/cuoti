@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>用户管理 - 错题本管理系统</title>
+  <link rel="stylesheet" href="/static/layui/css/layui.css">
+  <style>
+    .page-container {
+      padding: 20px;
+    }
+    .search-form {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .table-toolbar {
+      margin-bottom: 15px;
+    }
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #f0f0f0;
+    }
+    .avatar-placeholder {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4CAF50, #8BC34A);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: bold;
+    }
+    .status-normal {
+      color: #4CAF50;
+      background: #e8f5e9;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .status-disabled {
+      color: #f56c6c;
+      background: #ffebee;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .points-badge {
+      background: linear-gradient(135deg, #FFD700, #FFA500);
+      color: #fff;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <form class="layui-form search-form" id="searchForm">
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label">关键词</label>
+          <div class="layui-input-inline">
+            <input type="text" name="keyword" placeholder="手机号/昵称" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">年级</label>
+          <div class="layui-input-inline">
+            <select name="grade_id">
+              <option value="">全部年级</option>
+              {volist name="grades" id="vo"}
+              <option value="{$vo.id}">{$vo.name}</option>
+              {/volist}
+            </select>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">状态</label>
+          <div class="layui-input-inline">
+            <select name="status">
+              <option value="-1">全部状态</option>
+              <option value="1">正常</option>
+              <option value="0">禁用</option>
+            </select>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <button class="layui-btn layui-btn-normal" lay-submit lay-filter="search">
+            <i class="layui-icon layui-icon-search"></i> 搜索
+          </button>
+          <button type="reset" class="layui-btn layui-btn-primary">
+            <i class="layui-icon layui-icon-refresh"></i> 重置
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <table class="layui-hide" id="userTable" lay-filter="userTable"></table>
+
+    <script type="text/html" id="toolbarDemo">
+      <div class="table-toolbar">
+        <button class="layui-btn layui-btn-sm" lay-event="refresh">
+          <i class="layui-icon layui-icon-refresh"></i> 刷新
+        </button>
+      </div>
+    </script>
+
+    <script type="text/html" id="avatarTpl">
+      {{# if(d.avatar){ }}
+        <img src="{{d.avatar}}" class="user-avatar" alt="头像">
+      {{# } else { }}
+        <div class="avatar-placeholder">{{d.nickname ? d.nickname.charAt(0) : '用'}}</div>
+      {{# } }}
+    </script>
+
+    <script type="text/html" id="statusTpl">
+      {{# if(d.status == 1){ }}
+        <span class="status-normal">正常</span>
+      {{# } else { }}
+        <span class="status-disabled">禁用</span>
+      {{# } }}
+    </script>
+
+    <script type="text/html" id="pointsTpl">
+      <span class="points-badge">⭐ {{d.points}}</span>
+    </script>
+
+    <script type="text/html" id="barDemo">
+      <a class="layui-btn layui-btn-xs" lay-event="detail">查看</a>
+      <a class="layui-btn layui-btn-xs layui-btn-warm" lay-event="resetPwd">重置密码</a>
+      {{# if(d.status == 1){ }}
+        <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="disable">禁用</a>
+      {{# } else { }}
+        <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="enable">启用</a>
+      {{# } }}
+    </script>
+  </div>
+
+  <script src="/static/layui/layui.js"></script>
+  <script>
+    layui.use(['table', 'form', 'layer'], function(){
+      var table = layui.table;
+      var form = layui.form;
+      var layer = layui.layer;
+
+      var userTable = table.render({
+        elem: '#userTable',
+        url: '/admin/user/list',
+        toolbar: '#toolbarDemo',
+        defaultToolbar: ['filter', 'print', 'exports'],
+        cols: [[
+          {type: 'checkbox', fixed: 'left'},
+          {field: 'id', title: 'ID', width: 80, sort: true},
+          {field: 'avatar', title: '头像', width: 80, templet: '#avatarTpl'},
+          {field: 'nickname', title: '昵称', width: 120},
+          {field: 'phone', title: '手机号', width: 130},
+          {field: 'grade_name', title: '年级', width: 100},
+          {field: 'points', title: '积分', width: 100, templet: '#pointsTpl', sort: true},
+          {field: 'total_points', title: '累计积分', width: 100, sort: true},
+          {field: 'status_text', title: '状态', width: 80, templet: '#statusTpl'},
+          {field: 'last_login_time', title: '最后登录', width: 170},
+          {field: 'create_time', title: '注册时间', width: 170},
+          {title: '操作', width: 250, fixed: 'right', toolbar: '#barDemo'}
+        ]],
+        page: true,
+        limits: [10, 20, 50, 100],
+        limit: 10
+      });
+
+      table.on('toolbar(userTable)', function(obj){
+        var checkStatus = table.checkStatus(obj.config.id);
+        switch(obj.event){
+          case 'refresh':
+            userTable.reload();
+          break;
+        }
+      });
+
+      table.on('tool(userTable)', function(obj){
+        var data = obj.data;
+        
+        if(obj.event === 'detail'){
+          layer.open({
+            type: 2,
+            title: '用户详情',
+            shadeClose: true,
+            shade: 0.5,
+            area: ['800px', '600px'],
+            content: '/admin/user/detail?id=' + data.id
+          });
+        } else if(obj.event === 'resetPwd') {
+          layer.prompt({
+            formType: 1,
+            value: '123456',
+            title: '请输入新密码',
+            maxlength: 20
+          }, function(value, index){
+            layer.close(index);
+            var load = layer.load(2);
+            fetch('/admin/user/reset-password', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({id: data.id, password: value})
+            }).then(function(r){ return r.json(); })
+            .then(function(res){
+              layer.close(load);
+              if(res.code === 0 || res.code === 200){
+                layer.msg('重置成功', {icon: 1});
+              } else {
+                layer.msg(res.msg || '重置失败', {icon: 2});
+              }
+            });
+          });
+        } else if(obj.event === 'disable') {
+          layer.confirm('确定要禁用该用户吗？', function(index){
+            layer.close(index);
+            var load = layer.load(2);
+            fetch('/admin/user/update-status', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({id: data.id, status: 0})
+            }).then(function(r){ return r.json(); })
+            .then(function(res){
+              layer.close(load);
+              if(res.code === 0 || res.code === 200){
+                userTable.reload();
+                layer.msg('已禁用', {icon: 1});
+              }
+            });
+          });
+        } else if(obj.event === 'enable') {
+          layer.confirm('确定要启用该用户吗？', function(index){
+            layer.close(index);
+            var load = layer.load(2);
+            fetch('/admin/user/update-status', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({id: data.id, status: 1})
+            }).then(function(r){ return r.json(); })
+            .then(function(res){
+              layer.close(load);
+              if(res.code === 0 || res.code === 200){
+                userTable.reload();
+                layer.msg('已启用', {icon: 1});
+              }
+            });
+          });
+        }
+      });
+
+      form.on('submit(search)', function(data){
+        userTable.reload({
+          where: data.field,
+          page: { curr: 1 }
+        });
+        return false;
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,272 @@
+.add-container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding-bottom: 40rpx;
+}
+
+.photo-section {
+  background: #fff;
+  margin: 20rpx;
+  border-radius: 20rpx;
+  overflow: hidden;
+}
+
+.photo-area {
+  height: 400rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.photo-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.photo-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.photo-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+.photo-preview {
+  position: relative;
+}
+
+.preview-image {
+  width: 100%;
+  height: 400rpx;
+}
+
+.photo-actions {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  padding: 20rpx;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.5));
+}
+
+.action-btn {
+  flex: 1;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  border-radius: 40rpx;
+  margin: 0 10rpx;
+}
+
+.retake-btn {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.confirm-btn {
+  background: #4CAF50;
+}
+
+.btn-text {
+  font-size: 28rpx;
+  color: #fff;
+}
+
+.form-section {
+  background: #fff;
+  margin: 20rpx;
+  border-radius: 20rpx;
+  padding: 30rpx;
+}
+
+.form-item {
+  margin-bottom: 30rpx;
+}
+
+.form-item:last-child {
+  margin-bottom: 0;
+}
+
+.form-label {
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 16rpx;
+  font-weight: 500;
+}
+
+.form-picker {
+  width: 100%;
+  height: 88rpx;
+  background: #f5f5f5;
+  border-radius: 12rpx;
+  display: flex;
+  align-items: center;
+  padding: 0 24rpx;
+  box-sizing: border-box;
+}
+
+.picker-value {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 30rpx;
+  color: #333;
+}
+
+.picker-arrow {
+  color: #ccc;
+  font-size: 36rpx;
+}
+
+.form-input {
+  width: 100%;
+  height: 88rpx;
+  background: #f5f5f5;
+  border-radius: 12rpx;
+  padding: 0 24rpx;
+  font-size: 30rpx;
+  box-sizing: border-box;
+}
+
+.form-textarea {
+  width: 100%;
+  min-height: 160rpx;
+  background: #f5f5f5;
+  border-radius: 12rpx;
+  padding: 20rpx 24rpx;
+  font-size: 30rpx;
+  box-sizing: border-box;
+}
+
+.difficulty-selector {
+  display: flex;
+  gap: 20rpx;
+}
+
+.difficulty-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100rpx;
+  background: #f5f5f5;
+  border-radius: 16rpx;
+  transition: all 0.3s;
+}
+
+.difficulty-item.active {
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+}
+
+.star {
+  font-size: 28rpx;
+  color: #ddd;
+  margin-bottom: 6rpx;
+}
+
+.difficulty-item.active .star {
+  color: #FFD700;
+}
+
+.level-text {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.difficulty-item.active .level-text {
+  color: #fff;
+}
+
+.submit-section {
+  padding: 20rpx 30rpx;
+}
+
+.submit-btn {
+  margin-bottom: 20rpx;
+}
+
+.analyzing-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.analyzing-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.loading-spinner {
+  width: 80rpx;
+  height: 80rpx;
+  border: 6rpx solid rgba(255, 255, 255, 0.2);
+  border-top-color: #4CAF50;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.analyzing-text {
+  margin-top: 30rpx;
+  font-size: 28rpx;
+  color: #fff;
+}
+
+.points-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.points-content {
+  background: #fff;
+  border-radius: 32rpx;
+  padding: 60rpx 80rpx;
+  text-align: center;
+}
+
+.points-emoji {
+  font-size: 80rpx;
+  margin-bottom: 30rpx;
+}
+
+.points-big {
+  font-size: 72rpx;
+  font-weight: bold;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 16rpx;
+}
+
+.points-desc {
+  font-size: 28rpx;
+  color: #999;
+}

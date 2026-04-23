@@ -1,0 +1,86 @@
+<view class="profile-container">
+  <view class="header-section">
+    <view class="user-info">
+      <image class="avatar" src="{{userInfo.avatar || '/assets/default-avatar.png'}}" mode="aspectFill" wx:if="{{userInfo}}"></image>
+      <view class="avatar-placeholder" wx:else>{{userInfo.nickname ? userInfo.nickname.charAt(0) : '用'}}</view>
+      <view class="user-text">
+        <view class="nickname">{{userInfo.nickname || '用户'}}</view>
+        <view class="user-meta">
+          <text class="meta-item">{{userInfo.grade_name || ''}}</text>
+          <text class="meta-divider">|</text>
+          <text class="meta-item">{{userInfo.phone ? userInfo.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') : ''}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="points-banner">
+      <view class="points-item" bindtap="goToPoints">
+        <view class="points-icon">⭐</view>
+        <view class="points-info">
+          <view class="points-number">{{userInfo.points || 0}}</view>
+          <view class="points-label">当前积分</view>
+        </view>
+      </view>
+      <view class="points-divider"></view>
+      <view class="points-item">
+        <view class="points-icon">🏆</view>
+        <view class="points-info">
+          <view class="points-number">{{userInfo.total_points || 0}}</view>
+          <view class="points-label">累计获得</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="menu-section">
+    <view class="menu-group">
+      <view class="menu-item" bindtap="goToPoints">
+        <view class="menu-icon">📊</view>
+        <text class="menu-text">积分明细</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      
+      <view class="menu-item" bindtap="goToCollection">
+        <view class="menu-icon">📁</view>
+        <text class="menu-text">错题本</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      
+      <view class="menu-item" bindtap="goToCheckin">
+        <view class="menu-icon">📅</view>
+        <text class="menu-text">签到记录</text>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+
+    <view class="menu-group">
+      <view class="menu-item" bindtap="goToEditProfile">
+        <view class="menu-icon">⚙️</view>
+        <text class="menu-text">个人设置</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      
+      <view class="menu-item" bindtap="showFeedback">
+        <view class="menu-icon">💬</view>
+        <text class="menu-text">意见反馈</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      
+      <view class="menu-item" bindtap="showAbout">
+        <view class="menu-icon">ℹ️</view>
+        <text class="menu-text">关于我们</text>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="logout-section">
+    <view class="logout-btn" bindtap="doLogout">
+      退出登录
+    </view>
+  </view>
+
+  <view class="version-info">
+    <text class="version-text">错题本 v1.0.0</text>
+  </view>
+</view>

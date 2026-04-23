@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>错题详情 - 错题本管理系统</title>
+  <link rel="stylesheet" href="/static/layui/css/layui.css">
+  <style>
+    .page-container {
+      padding: 20px;
+    }
+    .detail-section {
+      background: #fff;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .info-item {
+      display: flex;
+      flex-direction: column;
+    }
+    .info-item label {
+      font-size: 13px;
+      color: #999;
+      margin-bottom: 5px;
+    }
+    .info-item value {
+      font-size: 15px;
+      color: #333;
+      font-weight: 500;
+    }
+    .question-image-large {
+      max-width: 100%;
+      max-height: 400px;
+      border-radius: 8px;
+      background: #f5f5f5;
+    }
+    .content-box {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px;
+      line-height: 1.8;
+    }
+    .answer-box {
+      background: #e8f5e9;
+      border-radius: 8px;
+      padding: 20px;
+      line-height: 1.8;
+    }
+    .analysis-box {
+      background: #e3f2fd;
+      border-radius: 8px;
+      padding: 20px;
+      line-height: 1.8;
+    }
+    .difficulty-star {
+      color: #FFD700;
+      font-size: 18px;
+    }
+    .difficulty-empty {
+      color: #ddd;
+      font-size: 18px;
+    }
+    .tag {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-right: 8px;
+    }
+    .tag-primary {
+      background: #e8f5e9;
+      color: #4CAF50;
+    }
+    .tag-warning {
+      background: #fff3e0;
+      color: #e6a23c;
+    }
+    .tag-info {
+      background: #e3f2fd;
+      color: #2196f3;
+    }
+    @media (max-width: 992px) {
+      .info-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <div class="detail-section">
+      <div class="section-title">基本信息</div>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>错题ID</label>
+          <value>{$question.id}</value>
+        </div>
+        <div class="info-item">
+          <label>所属用户</label>
+          <value>{$userName}</value>
+        </div>
+        <div class="info-item">
+          <label>科目</label>
+          <value>{$subjectName}</value>
+        </div>
+        <div class="info-item">
+          <label>年级</label>
+          <value>{$gradeName}</value>
+        </div>
+        <div class="info-item">
+          <label>难度</label>
+          <value>
+            {for start="0" end="$question.difficulty-1"}
+              <span class="difficulty-star">★</span>
+            {/for}
+            {for start="$question.difficulty" end="2"}
+              <span class="difficulty-empty">★</span>
+            {/for}
+          </value>
+        </div>
+        <div class="info-item">
+          <label>状态</label>
+          <value>
+            {if $question.is_mastered}
+              <span class="tag tag-primary">已掌握</span>
+            {else /}
+              <span class="tag tag-warning">待掌握</span>
+            {/if}
+          </value>
+        </div>
+        <div class="info-item">
+          <label>做错次数</label>
+          <value><span style="color: #f56c6c; font-weight: bold;">{$question.error_count}</span> 次</value>
+        </div>
+        <div class="info-item">
+          <label>知识点</label>
+          <value>{$question.knowledge_points ? $question.knowledge_points : '未设置'}</value>
+        </div>
+        <div class="info-item">
+          <label>记录时间</label>
+          <value>{$question.create_time}</value>
+        </div>
+      </div>
+    </div>
+
+    {if $question.image_url}
+    <div class="detail-section">
+      <div class="section-title">题目图片</div>
+      <img src="{$question.image_url}" class="question-image-large" alt="题目图片">
+    </div>
+    {/if}
+
+    {if $question.question_text}
+    <div class="detail-section">
+      <div class="section-title">题目内容</div>
+      <div class="content-box">
+        {$question.question_text|nl2br}
+      </div>
+    </div>
+    {/if}
+
+    {if $question.answer_text}
+    <div class="detail-section">
+      <div class="section-title">正确答案</div>
+      <div class="answer-box">
+        {$question.answer_text|nl2br}
+      </div>
+    </div>
+    {/if}
+
+    {if $question.analysis}
+    <div class="detail-section">
+      <div class="section-title">解析</div>
+      <div class="analysis-box">
+        {$question.analysis|nl2br}
+      </div>
+    </div>
+    {/if}
+
+    <div class="detail-section">
+      <div class="section-title">练习记录（最近20条）</div>
+      <table class="layui-table">
+        <thead>
+          <tr>
+            <th width="80">答题结果</th>
+            <th width="150">用户答案</th>
+            <th width="150">用时</th>
+            <th width="200">时间</th>
+          </tr>
+        </thead>
+        <tbody>
+          {volist name="examRecords" id="vo"}
+          <tr>
+            <td>
+              {if $vo.is_correct}
+                <span style="color: #4CAF50; font-weight: bold;">✓ 正确</span>
+              {else /}
+                <span style="color: #f56c6c; font-weight: bold;">✕ 错误</span>
+              {/if}
+            </td>
+            <td>{$vo.user_answer ? $vo.user_answer : '-'}</td>
+            <td>{$vo.used_time} 秒</td>
+            <td>{$vo.create_time}</td>
+          </tr>
+          {empty name="examRecords"}
+          <tr>
+            <td colspan="4" style="text-align: center; color: #999;">暂无练习记录</td>
+          </tr>
+          {/empty}
+          {/volist}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

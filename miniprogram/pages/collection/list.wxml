@@ -1,0 +1,90 @@
+<view class="collection-container">
+  <view class="header-section">
+    <view class="stats-card">
+      <view class="stats-item">
+        <view class="stats-number">{{totalCollections}}</view>
+        <view class="stats-label">错题本数</view>
+      </view>
+      <view class="stats-divider"></view>
+      <view class="stats-item">
+        <view class="stats-number">{{totalQuestions}}</view>
+        <view class="stats-label">包含题目</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="list-section">
+    <view class="list-header">
+      <text class="list-title">我的错题本</text>
+      <view class="create-btn" bindtap="createCollection">
+        <text class="plus-icon">+</text>
+        <text>新建</text>
+      </view>
+    </view>
+
+    <view class="collection-list">
+      <view class="collection-item" wx:for="{{collections}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
+        <view class="collection-cover">
+          <view class="cover-icon">📁</view>
+          <view class="cover-badge">{{item.question_count}}题</view>
+        </view>
+        <view class="collection-info">
+          <view class="collection-name">{{item.name}}</view>
+          <view class="collection-desc">{{item.description || '暂无描述'}}</view>
+          <view class="collection-meta">
+            <text class="meta-text">{{item.subject_name || '全科目'}}</text>
+            <text class="meta-divider">|</text>
+            <text class="meta-text">{{item.create_time}}</text>
+          </view>
+        </view>
+        <text class="collection-arrow">›</text>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{collections.length === 0 && !loading}}">
+      <view class="empty-icon">📁</view>
+      <view class="empty-text">还没有错题本</view>
+      <view class="empty-tip">点击右上角新建按钮创建错题本</view>
+    </view>
+
+    <view class="loading-more" wx:if="{{loading}}">
+      <text>加载中...</text>
+    </view>
+
+    <view class="no-more" wx:if="{{noMore && collections.length > 0}}">
+      <text>没有更多了</text>
+    </view>
+  </view>
+
+  <view class="create-popup" wx:if="{{showCreatePopup}}" catchtouchmove="preventMove">
+    <view class="popup-mask" bindtap="closePopup"></view>
+    <view class="popup-content">
+      <view class="popup-header">
+        <text class="popup-title">新建错题本</text>
+        <text class="popup-close" bindtap="closePopup">✕</text>
+      </view>
+      <view class="popup-body">
+        <view class="form-item">
+          <text class="form-label">错题本名称</text>
+          <input class="form-input" placeholder="请输入错题本名称" value="{{newCollection.name}}" bindinput="onNameInput" maxlength="20" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">描述（可选）</text>
+          <textarea class="form-textarea" placeholder="简单描述一下这个错题本的用途" value="{{newCollection.description}}" bindinput="onDescInput" maxlength="100" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">关联科目</text>
+          <view class="subject-select">
+            <view class="subject-item {{subjectId === item.id ? 'active' : ''}}" wx:for="{{subjects}}" wx:key="id" bindtap="selectSubject" data-id="{{item.id}}">
+              {{item.name}}
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="popup-footer">
+        <view class="btn-outline" bindtap="closePopup">取消</view>
+        <view class="btn-primary" bindtap="submitCreate">确定</view>
+      </view>
+    </view>
+  </view>
+</view>
