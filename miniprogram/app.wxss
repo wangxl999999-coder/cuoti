@@ -37,7 +37,7 @@ page {
   color: #4CAF50;
   border-radius: 40rpx;
   height: 88rpx;
-  line-height: 84rpx;
+  line-height: 88rpx;
   text-align: center;
   font-size: 32rpx;
   font-weight: 500;

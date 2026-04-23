@@ -52,9 +52,9 @@ class UserController extends BaseApiController
         
         $user = new User();
         $user->phone = $phone;
-        $user->openid = $openid;
+        $user->openid = !empty($openid) ? $openid : null;
         $user->grade_id = $gradeId;
-        $user->nickname = $nickname ?: '用户' . substr($phone ?: $openid, -4);
+        $user->nickname = $nickname ?: '用户' . substr($phone ?: ($openid ?: uniqid()), -4);
         $user->points = 0;
         $user->total_points = 0;
         $user->status = 1;
