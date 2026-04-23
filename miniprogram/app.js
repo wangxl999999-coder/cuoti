@@ -2,7 +2,7 @@ App({
   globalData: {
     userInfo: null,
     token: '',
-    baseUrl: 'https://cuoti.com/api',
+    baseUrl: 'http://cuoti.com/api',
     grades: [],
     subjects: []
   },
