@@ -4,7 +4,7 @@ declare (strict_types = 1);
 namespace app\controller\api;
 
 use think\facade\Request;
-use think\facade\Session;
+use think\facade\Cache;
 use think\facade\Db;
 use app\model\User;
 use app\model\Grade;
@@ -66,10 +66,10 @@ class UserController extends BaseApiController
         $user->save();
         
         $token = $this->generateToken();
-        Session::set('user_' . $token, [
+        Cache::set('token_' . $token, [
             'user_id' => $user->id,
             'create_time' => time()
-        ]);
+        ], 86400 * 7);
         
         return $this->success([
             'token' => $token,
@@ -129,10 +129,10 @@ class UserController extends BaseApiController
         $user->save();
         
         $token = $this->generateToken();
-        Session::set('user_' . $token, [
+        Cache::set('token_' . $token, [
             'user_id' => $user->id,
             'create_time' => time()
-        ]);
+        ], 86400 * 7);
         
         $grade = Grade::find($user->grade_id);
         
@@ -154,7 +154,7 @@ class UserController extends BaseApiController
     {
         $token = Request::header('token', '');
         if ($token) {
-            Session::delete('user_' . $token);
+            Cache::delete('token_' . $token);
         }
         return $this->success(null, '退出成功');
     }
