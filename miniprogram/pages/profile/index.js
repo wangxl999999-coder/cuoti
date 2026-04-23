@@ -13,19 +13,36 @@ Page({
     this.loadUserInfo();
   },
 
+  maskPhone: function(phone) {
+    if (!phone) return '';
+    if (phone.length === 11) {
+      return phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
+    }
+    return phone;
+  },
+
+  formatUserInfo: function(userInfo) {
+    if (!userInfo) return userInfo;
+    const formatted = Object.assign({}, userInfo);
+    formatted._nicknameFirstChar = formatted.nickname ? formatted.nickname.charAt(0) : '用';
+    formatted._maskedPhone = this.maskPhone(formatted.phone);
+    return formatted;
+  },
+
   loadUserInfo: function() {
+    const that = this;
     const userInfo = wx.getStorageSync('userInfo');
     if (userInfo) {
-      this.setData({ userInfo: userInfo });
+      that.setData({ userInfo: that.formatUserInfo(userInfo) });
     }
     
-    const that = this;
     app.request({
       url: '/user/info',
       method: 'GET',
       success: function(res) {
         if (res.code === 200) {
-          that.setData({ userInfo: res.data });
+          const formattedUser = that.formatUserInfo(res.data);
+          that.setData({ userInfo: formattedUser });
           wx.setStorageSync('userInfo', res.data);
         }
       }

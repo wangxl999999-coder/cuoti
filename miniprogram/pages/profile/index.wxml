@@ -2,13 +2,13 @@
   <view class="header-section">
     <view class="user-info">
       <image class="avatar" src="{{userInfo.avatar || '/assets/default-avatar.png'}}" mode="aspectFill" wx:if="{{userInfo}}"></image>
-      <view class="avatar-placeholder" wx:else>{{userInfo.nickname ? userInfo.nickname.charAt(0) : '用'}}</view>
+      <view class="avatar-placeholder" wx:else>{{userInfo._nicknameFirstChar || '用'}}</view>
       <view class="user-text">
         <view class="nickname">{{userInfo.nickname || '用户'}}</view>
         <view class="user-meta">
           <text class="meta-item">{{userInfo.grade_name || ''}}</text>
           <text class="meta-divider">|</text>
-          <text class="meta-item">{{userInfo.phone ? userInfo.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') : ''}}</text>
+          <text class="meta-item">{{userInfo._maskedPhone || ''}}</text>
         </view>
       </view>
     </view>

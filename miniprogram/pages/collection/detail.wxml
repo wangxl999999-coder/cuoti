@@ -92,7 +92,7 @@
         </view>
         <view class="select-list">
           <view class="select-item" wx:for="{{availableQuestions}}" wx:key="id">
-            <checkbox class="select-checkbox" value="{{item.id}}" checked="{{selectedIds.includes(item.id)}}" bindchange="toggleSelect" data-id="{{item.id}}" color="#4CAF50" />
+            <checkbox class="select-checkbox" value="{{item.id}}" checked="{{item._selected}}" bindchange="toggleSelect" data-id="{{item.id}}" color="#4CAF50" />
             <view class="select-content">
               <view class="select-text">{{item.question_text || '错题'}}</view>
               <view class="select-meta">
