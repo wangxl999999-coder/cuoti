@@ -5,7 +5,7 @@ namespace app\controller\api;
 
 use app\BaseController;
 use think\facade\Request;
-use think\facade\Session;
+use think\facade\Cache;
 use app\model\User;
 
 class BaseApiController extends BaseController
@@ -25,9 +25,9 @@ class BaseApiController extends BaseController
     
     protected function checkToken($token)
     {
-        $sessionData = Session::get('user_' . $token);
-        if ($sessionData && isset($sessionData['user_id'])) {
-            $this->userId = $sessionData['user_id'];
+        $cacheData = Cache::get('token_' . $token);
+        if ($cacheData && isset($cacheData['user_id'])) {
+            $this->userId = $cacheData['user_id'];
             $this->user = User::find($this->userId);
         }
     }
